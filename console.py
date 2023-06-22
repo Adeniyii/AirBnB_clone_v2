@@ -2,6 +2,9 @@
 """ Console Module """
 import cmd
 import sys
+import re
+import json
+import uuid
 from models.base_model import BaseModel
 from models.__init__ import storage
 from models.user import User
@@ -41,46 +44,28 @@ class HBNBCommand(cmd.Cmd):
         Usage: <class name>.<command>([<id> [<*args> or <**kwargs>]])
         (Brackets denote optional fields in usage example.)
         """
-        _cmd = _cls = _id = _args = ''  # initialize line elements
 
-        # scan for general formating - i.e '.', '(', ')'
+        kwargs_pattern = re.compile(r'(\w*)=(\"?[a-z0-9A-Z_.\"-]*)\"?',
+                                    re.MULTILINE)
+        line_segments = line.split(" ", 2)
+
+        matched_kwargs = kwargs_pattern.findall(line)
+
+        if matched_kwargs and line_segments[0] == "create":
+            args_dict = {
+                v[0]: v[1].strip("\"").replace("_", " ")
+                for v in matched_kwargs}
+
+            str_dict = json.dumps(args_dict)
+            return "{} {} {}".format(line_segments[0], line_segments[1],
+                                     str_dict)
+
+        # checks if a dot command `<class>.<command>()` was not used
         if not ('.' in line and '(' in line and ')' in line):
             return line
 
-        try:  # parse line left to right
-            pline = line[:]  # parsed line
-
-            # isolate <class name>
-            _cls = pline[:pline.find('.')]
-
-            # isolate and validate <command>
-            _cmd = pline[pline.find('.') + 1:pline.find('(')]
-            if _cmd not in HBNBCommand.dot_cmds:
-                raise Exception
-
-            # if parantheses contain arguments, parse them
-            pline = pline[pline.find('(') + 1:pline.find(')')]
-            if pline:
-                # partition args: (<id>, [<delim>], [<*args>])
-                pline = pline.partition(', ')  # pline convert to tuple
-
-                # isolate _id, stripping quotes
-                _id = pline[0].replace('\"', '')
-                # possible bug here:
-                # empty quotes register as empty _id when replaced
-
-                # if arguments exist beyond _id
-                pline = pline[2].strip()  # pline is now str
-                if pline:
-                    # check for *args or **kwargs
-                    if pline[0] is '{' and pline[-1] is'}'\
-                            and type(eval(pline)) is dict:
-                        _args = pline
-                    else:
-                        _args = pline.replace(',', '')
-                        # _args = _args.replace('\"', '')
-            line = ' '.join([_cmd, _cls, _id, _args])
-
+        try:
+            line = self.handle_dot_usage(line)
         except Exception as mess:
             pass
         finally:
@@ -115,13 +100,25 @@ class HBNBCommand(cmd.Cmd):
 
     def do_create(self, args):
         """ Create an object of any class"""
-        if not args:
-            print("** class name missing **")
-            return
-        elif args not in HBNBCommand.classes:
-            print("** class doesn't exist **")
-            return
-        new_instance = HBNBCommand.classes[args]()
+        parsed_obj = {}
+        arg_list = args.split(" ", 1)
+
+        if len(arg_list) > 1:
+            try:
+                parsed_obj = json.loads(arg_list[1])
+                parsed_obj['id'] = str(uuid.uuid4())
+            except (json.decoder.JSONDecodeError) as err:
+                print("json errrrrrrr")
+                return
+        else:
+            if not arg_list[0]:
+                print("** class name missing **")
+                return
+            elif arg_list[0] not in HBNBCommand.classes:
+                print("** class doesn't exist **")
+                return
+
+        new_instance = HBNBCommand.classes[arg_list[0]](**parsed_obj)
         storage.save()
         print(new_instance.id)
         storage.save()
@@ -272,7 +269,7 @@ class HBNBCommand(cmd.Cmd):
                 args.append(v)
         else:  # isolate args
             args = args[2]
-            if args and args[0] is '\"':  # check for quoted arg
+            if args and args[0] == '\"':  # check for quoted arg
                 second_quote = args.find('\"', 1)
                 att_name = args[1:second_quote]
                 args = args[second_quote + 1:]
@@ -280,10 +277,10 @@ class HBNBCommand(cmd.Cmd):
             args = args.partition(' ')
 
             # if att_name was not quoted arg
-            if not att_name and args[0] is not ' ':
+            if not att_name and args[0] != ' ':
                 att_name = args[0]
             # check for quoted val arg
-            if args[2] and args[2][0] is '\"':
+            if args[2] and args[2][0] == '\"':
                 att_val = args[2][1:args[2].find('\"', 1)]
 
             # if att_val was not quoted arg
@@ -319,6 +316,51 @@ class HBNBCommand(cmd.Cmd):
         """ Help information for the update class """
         print("Updates an object with new information")
         print("Usage: update <className> <id> <attName> <attVal>\n")
+
+    @staticmethod
+    def parse_command(pline: str):
+        return pline[pline.find('.') + 1:pline.find('(')]
+
+    @staticmethod
+    def extract_args(pline: str):
+        return pline[pline.find('(') + 1:pline.find(')')]
+
+    def handle_dot_usage(self, line):
+        _cmd = _cls = _id = _args = ''  # initialize line elements
+        # isolate <class name>
+        _cls = line[:line.find('.')]
+
+        _cmd = self.parse_command(line)
+
+        if _cmd not in HBNBCommand.dot_cmds:
+            raise Exception
+
+        line = self.extract_args(line)
+
+        if line:
+            # partition args: (<id>, [<delim>], [<*args>])
+            line = line.partition(', ')  # pline convert to tuple
+
+            # isolate _id, stripping quotes
+            _id = line[0].replace('\"', '')
+            # possible bug here:
+            # empty quotes register as empty _id when replaced
+
+            # if arguments exist beyond _id
+            line = line[2].strip()  # pline is now str
+
+            if line:
+                # check for *args or **kwargs
+                if line[0] == '{' and line[-1] == '}'\
+                        and type(eval(line)) is dict:
+                    _args = line
+                else:
+                    _args = line.replace(',', '')
+                    # _args = _args.replace('\"', '')
+        line = ' '.join([_cmd, _cls, _id, _args])
+
+        return line
+
 
 if __name__ == "__main__":
     HBNBCommand().cmdloop()
