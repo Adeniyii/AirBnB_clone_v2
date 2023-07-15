@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 """Fabric script that defines a function do_pack()
 which generates a .tgz archive from the contents of the
 web_static folder, using the function"""
