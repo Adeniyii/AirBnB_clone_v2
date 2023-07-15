@@ -9,15 +9,17 @@ import os
 
 def do_pack():
     """Generate an archive of /web_static folder"""
+    try:
+        d = datetime.now()
+        date = d.strftime('%Y%m%d%H%M%S')
+        os.makedirs("versions", exist_ok=True)
+        fn = "versions/web_static_{}.tgz".format(date)
 
-    d = datetime.now()
-    date = d.strftime('%Y%m%d%H%M%S')
-    os.makedirs("versions", exist_ok=True)
+        out = local("tar -czvf {} web_static".format(fn))
 
-    out = local("tar -czvf versions/web_static_{}.tgz web_static".format(date),
-                capture=True)
-
-    if out.succeeded:
-        return "./{}".format(out.command.split(" ")[2])
-    else:
+        if out.succeeded:
+            return "./{}".format(out.command.split(" ")[2])
+        else:
+            return None
+    except Exception:
         return None
