@@ -16,8 +16,4 @@ sudo chown -R ubuntu:ubuntu /data/
 new_string="\\\n\n\tlocation \/hbnb_static {\n\t\t alias /data/web_static/current/;\n\t\t try_files \$uri \$uri/ =404;\n\t}"
 sudo sed -i "65i $new_string" /etc/nginx/sites-available/default
 
-# sudo touch /etc/nginx/sites-available/airbnb
-# sudo sed -i "54i $new_string" /etc/nginx/sites-available/airbnb
-# sudo ln -s /etc/nginx/sites-available/airbnb /etc/nginx/sites-enabled/airbnb
-
 sudo service nginx start
