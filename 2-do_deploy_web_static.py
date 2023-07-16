@@ -10,8 +10,6 @@ env.hosts = [
     "54.158.255.184"
 ]
 
-env.user = "ubuntu"
-
 
 def do_deploy(archive_path):
     """distributes an archive to web servers
@@ -35,5 +33,6 @@ def do_deploy(archive_path):
         run("rm /tmp/{}".format(archive_fn))
         run("rm -rf /data/web_static/current")
         run("ln -sf {} /data/web_static/current".format(archive_dir))
+        return True
     except Exception:
         return False
