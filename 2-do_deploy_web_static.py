@@ -29,8 +29,9 @@ def do_deploy(archive_path):
         run("mkdir -p {}".format(archive_dir))
         run("tar -xzf /tmp/{fn} --directory {dir}".format(
             fn=archive_fn, dir=archive_dir))
-        run("mv {dir}/web_static/* {dir}".format(dir=archive_dir))
-        run("rm -rf {dir}/web_static")
+        run("rsync -a {dir}/web_static/* {dir}".format(dir=archive_dir))
+        sudo("chown -R ubuntu:ubuntu /data/")
+        run("rm -rf {dir}/web_static".format(dir=archive_dir))
         run("rm /tmp/{}".format(archive_fn))
         run("rm -rf /data/web_static/current")
         run("ln -sf {} /data/web_static/current".format(archive_dir))
