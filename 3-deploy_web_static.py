@@ -15,12 +15,11 @@ env.hosts = [
 def do_pack():
     """Generate an archive of /web_static folder"""
     try:
-        d = datetime.now()
-        date = d.strftime('%Y%m%d%H%M%S')
         os.makedirs("versions", exist_ok=True)
+        date = datetime.now().strftime('%Y%m%d%H%M%S')
         fn = "versions/web_static_{}.tgz".format(date)
 
-        out = local("tar -czvf {} web_static".format(fn))
+        out = local("tar -czvf {} ./web_static/".format(fn))
 
         if out.succeeded:
             return "./{}".format(out.command.split(" ")[2])
