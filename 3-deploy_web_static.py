@@ -1,14 +1,33 @@
 #!/usr/bin/python3
-"""Defines a fabric function `do_deploy` that distributes
+"""Defines a fabric function `deploy` that distributes
 an archive to web servers"""
 
 from fabric.api import *
+from datetime import datetime
 import os
 
 env.hosts = [
     "54.157.187.24",
     "54.158.255.184"
 ]
+
+
+def do_pack():
+    """Generate an archive of /web_static folder"""
+    try:
+        d = datetime.now()
+        date = d.strftime('%Y%m%d%H%M%S')
+        os.makedirs("versions", exist_ok=True)
+        fn = "versions/web_static_{}.tgz".format(date)
+
+        out = local("tar -czvf {} web_static".format(fn))
+
+        if out.succeeded:
+            return "./{}".format(out.command.split(" ")[2])
+        else:
+            return None
+    except Exception:
+        return None
 
 
 def do_deploy(archive_path):
@@ -36,3 +55,11 @@ def do_deploy(archive_path):
         return True
     except Exception:
         return False
+
+
+def deploy():
+    archive_path = do_pack()
+    if archive_path is None:
+        return False
+
+    return do_deploy(archive_path)
