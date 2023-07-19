@@ -57,7 +57,8 @@ def do_deploy(archive_path):
 
 
 def clean(number=0):
-    """delete (total - number) amount of out-of-date archives"""
+    """Delete (total - number) amount of out-of-date archives
+    """
     with lcd("./versions"):
         if number > 1:
             local("ls -t | tail -n +{} | rm -f".format(number + 1))
