@@ -65,6 +65,11 @@ def do_clean(number=0):
             local("ls -t | tail -n +{} | xargs rm -f".format(number + 1))
         else:
             local("ls -t | tail -n +2 | xargs rm -f")
+    with cd("/data/web_static/releases"):
+        if number > 1:
+            run("ls -t | tail -n +{} | xargs rm -rf".format(number + 1))
+        else:
+            run("ls -t | tail -n +2 | xargs rm -rf")
 
 
 def deploy():
