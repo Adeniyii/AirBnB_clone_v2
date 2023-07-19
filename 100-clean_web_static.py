@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 """Defines fabric functions that distributes
-an archive to web servers, then extracts and deploys it"""
+an archive to web servers, deploys it, and cleans up after"""
 
 from fabric.api import *
 from datetime import datetime
@@ -54,6 +54,15 @@ def do_deploy(archive_path):
         return True
     except Exception:
         return False
+
+
+def clean(number=0):
+    """delete `total - number` amount of out-of-date archives"""
+    with lcd("./versions"):
+        if number > 1:
+            local("ls -t | tail -n +{} | rm -f".format(number + 1))
+        else:
+            local("ls -t | tail -n +2 | rm -f")
 
 
 def deploy():
