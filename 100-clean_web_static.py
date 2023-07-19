@@ -56,7 +56,7 @@ def do_deploy(archive_path):
         return False
 
 
-def clean(number=0):
+def do_clean(number=0):
     """Delete (total - number) amount of out-of-date archives
     """
     with lcd("./versions"):
