@@ -12,12 +12,14 @@ class DBStorage:
         from sqlalchemy.schema import MetaData
         import os
 
+        user = os.getenv('HBNB_MYSQL_USER')
+        pwd = os.getenv('HBNB_MYSQL_PWD')
+        host = os.getenv('HBNB_MYSQL_HOST')
+        env = os.getenv('HBNB_ENV')
+
         engine = create_engine(
-            'mysql+mysqldb://{}:{}@{}/{}'.format(
-                os.environ.get('HBNB_MYSQL_USER'),
-                os.environ.get('HBNB_MYSQL_PWD'),
-                os.environ.get('HBNB_MYSQL_HOST'),
-                os.environ.get('HBNB_ENV')), pool_pre_ping=True)
+            'mysql+mysqldb://{}:{}@{}/{}'.format(user, pwd, host, env),
+            pool_pre_ping=True)
 
         self.__engine = engine
         self.__metadata_obj = MetaData()
