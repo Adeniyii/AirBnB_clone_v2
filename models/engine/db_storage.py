@@ -9,20 +9,17 @@ class DBStorage:
 
     def __init__(self) -> None:
         from sqlalchemy import create_engine
-        from sqlalchemy.orm import sessionmaker
         from sqlalchemy.schema import MetaData
         import os
 
-        Session = sessionmaker(bind=self.__engine)
-
-        self.__engine = create_engine(
+        engine = create_engine(
             'mysql+mysqldb://{}:{}@{}/{}'.format(
                 os.environ.get('HBNB_MYSQL_USER'),
                 os.environ.get('HBNB_MYSQL_PWD'),
                 os.environ.get('HBNB_MYSQL_HOST'),
                 os.environ.get('HBNB_ENV')), pool_pre_ping=True)
 
-        self.__session = Session()
+        self.__engine = engine
         self.__metadata_obj = MetaData()
 
         if (os.environ.get('HBNB_TYPE_STORAGE') == 'test'):
@@ -30,7 +27,40 @@ class DBStorage:
 
     def all(self, cls=None):
         """Returns a dictionary of model instances from the database"""
+        result = []
         if cls is None:
             tables = self.__metadata_obj.tables
             for k, v in tables.items():
-                v.select().order_by(None)
+                result.append(self.__session.query(v).all())
+                # result.append(v.select().columns)
+        else:
+            result.append(self.__session.query(cls).all())
+
+        return result
+
+    def new(self, obj=None):
+        """Add a new object to the current session"""
+        if obj is None:
+            return None
+
+        self.__session.add(obj)
+
+    def save(self):
+        """Commit all session changes to the database"""
+        self.__session.commit()
+
+    def delete(self, obj=None):
+        """Deletes the passed object from the database"""
+        if obj is None:
+            return None
+        self.__session.delete(obj)
+
+    def reload(self):
+        """Creates all tables in the database"""
+        from models.city import City
+        from models.state import State
+        from sqlalchemy.orm import sessionmaker, scoped_session
+
+        session_factory = sessionmaker(self.__engine, expire_on_commit=False)
+        self.__session = scoped_session(session_factory)
+        self.__metadata_obj.create_all(bind=self.__engine)
