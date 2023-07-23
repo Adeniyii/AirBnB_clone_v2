@@ -44,7 +44,6 @@ class HBNBCommand(cmd.Cmd):
         Usage: <class name>.<command>([<id> [<*args> or <**kwargs>]])
         (Brackets denote optional fields in usage example.)
         """
-
         kwargs_pattern = re.compile(r'(\w*)=(\"?[a-z0-9A-Z_.\"-]*)\"?',
                                     re.MULTILINE)
         line_segments = line.split(" ", 2)
@@ -52,11 +51,20 @@ class HBNBCommand(cmd.Cmd):
         matched_kwargs = kwargs_pattern.findall(line)
 
         if matched_kwargs and line_segments[0] == "create":
-            args_dict = {
-                v[0]: v[1].strip("\"").replace("_", " ")
-                for v in matched_kwargs}
+            args_dict = {}
+
+            for v in matched_kwargs:
+                if v[1].find("\"") >= 0:
+                    args_dict[v[0]] = v[1].strip("\"").replace("_", " ")
+                elif re.search(r'-?\d*\.\d*', v[1]):
+                    args_dict[v[0]] = float(v[1])
+                elif re.search(r'-?\d*', v[1]):
+                    args_dict[v[0]] = int(v[1])
+                else:
+                    args_dict[v[0]] = v[1].strip("\"").replace("_", " ")
 
             str_dict = json.dumps(args_dict)
+            print("str_dict: ", str_dict)
             return "{} {} {}".format(line_segments[0], line_segments[1],
                                      str_dict)
 
