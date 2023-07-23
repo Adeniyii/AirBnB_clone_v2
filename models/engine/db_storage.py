@@ -9,7 +9,7 @@ class DBStorage:
 
     def __init__(self) -> None:
         from sqlalchemy import create_engine
-        from sqlalchemy.schema import MetaData
+        from models.base_model import Base
         import os
 
         user = os.getenv('HBNB_MYSQL_USER')
@@ -22,10 +22,10 @@ class DBStorage:
             pool_pre_ping=True)
 
         self.__engine = engine
-        self.__metadata_obj = MetaData()
+        self.__metadata_obj = Base.metadata
 
-        if (os.environ.get('HBNB_TYPE_STORAGE') == 'test'):
-            MetaData.drop_all(bind=self.__engine, checkfirst=True)
+        if (os.getenv('HBNB_TYPE_STORAGE') == 'test'):
+            self.__metadata_obj.drop_all(bind=self.__engine, checkfirst=True)
 
     def all(self, cls=None):
         """Returns a dictionary of model instances from the database"""
@@ -44,7 +44,6 @@ class DBStorage:
         """Add a new object to the current session"""
         if obj is None:
             return None
-
         self.__session.add(obj)
 
     def save(self):
@@ -63,6 +62,7 @@ class DBStorage:
         from models.state import State
         from sqlalchemy.orm import sessionmaker, scoped_session
 
-        session_factory = sessionmaker(self.__engine, expire_on_commit=False)
-        self.__session = scoped_session(session_factory)
         self.__metadata_obj.create_all(bind=self.__engine)
+
+        session_factory = sessionmaker(self.__engine, expire_on_commit=False)
+        self.__session = scoped_session(session_factory)()
