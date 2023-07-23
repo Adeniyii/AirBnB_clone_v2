@@ -64,7 +64,6 @@ class HBNBCommand(cmd.Cmd):
                     args_dict[v[0]] = v[1].strip("\"").replace("_", " ")
 
             str_dict = json.dumps(args_dict)
-            print("str_dict: ", str_dict)
             return "{} {} {}".format(line_segments[0], line_segments[1],
                                      str_dict)
 
