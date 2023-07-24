@@ -32,6 +32,7 @@ class HBNBCommand(cmd.Cmd):
              'max_guest': int, 'price_by_night': int,
              'latitude': float, 'longitude': float
             }
+    FLAG_END_MANY = "end-many"
 
     def preloop(self):
         """Prints if isatty is false"""
@@ -44,45 +45,57 @@ class HBNBCommand(cmd.Cmd):
         Usage: <class name>.<command>([<id> [<*args> or <**kwargs>]])
         (Brackets denote optional fields in usage example.)
         """
-        kwargs_pattern = re.compile(r'(\w*)=(\"?[a-z0-9A-Z_.\"-]*)\"?',
-                                    re.MULTILINE)
-        line_segments = line.split(" ", 2)
+        if line.find("+") >= 0:
+            commands = line.split(" + ")
+            for cmd in commands:
+                self.onecmd(cmd)
+            return type(self).FLAG_END_MANY
+        else:
+            kwargs_pattern = re.compile(r'(\w*)=(\"?[a-z0-9A-Z_.\"-]*)\"?',
+                                        re.MULTILINE)
+            line_segments = line.split(" ", 2)
 
-        matched_kwargs = kwargs_pattern.findall(line)
+            matched_kwargs = kwargs_pattern.findall(line)
 
-        if matched_kwargs and line_segments[0] == "create":
-            args_dict = {}
+            if matched_kwargs and line_segments[0] == "create":
+                args_dict = {}
 
-            for v in matched_kwargs:
-                if v[1].find("\"") >= 0:
-                    args_dict[v[0]] = v[1].strip("\"").replace("_", " ")
-                elif re.search(r'-?\d*\.\d*', v[1]):
-                    args_dict[v[0]] = float(v[1])
-                elif re.search(r'-?\d*', v[1]):
-                    args_dict[v[0]] = int(v[1])
-                else:
-                    args_dict[v[0]] = v[1].strip("\"").replace("_", " ")
+                for v in matched_kwargs:
+                    if v[1].find("\"") >= 0:
+                        args_dict[v[0]] = v[1].strip("\"").replace("_", " ")
+                    elif re.search(r'-?\d*\.\d*', v[1]):
+                        args_dict[v[0]] = float(v[1])
+                    elif re.search(r'-?\d*', v[1]):
+                        args_dict[v[0]] = int(v[1])
+                    else:
+                        args_dict[v[0]] = v[1].strip("\"").replace("_", " ")
 
-            str_dict = json.dumps(args_dict)
-            return "{} {} {}".format(line_segments[0], line_segments[1],
-                                     str_dict)
+                str_dict = json.dumps(args_dict)
+                return "{} {} {}".format(
+                    line_segments[0], line_segments[1], str_dict)
 
-        # checks if a dot command `<class>.<command>()` was not used
-        if not ('.' in line and '(' in line and ')' in line):
-            return line
+            # checks if a dot command `<class>.<command>()` was not used
+            if not ('.' in line and '(' in line and ')' in line):
+                return line
 
-        try:
-            line = self.handle_dot_usage(line)
-        except Exception as mess:
-            pass
-        finally:
-            return line
+            try:
+                line = self.handle_dot_usage(line)
+            except Exception:
+                pass
+            finally:
+                return line
 
     def postcmd(self, stop, line):
         """Prints if isatty is false"""
         if not sys.__stdin__.isatty():
             print('(hbnb) ', end='')
         return stop
+
+    def default(self, line):
+        """Handle unknown commands"""
+        if line == type(self).FLAG_END_MANY:
+            return
+        cmd.Cmd.default(self, line)
 
     def do_quit(self, command):
         """ Method to exit the HBNB console"""
