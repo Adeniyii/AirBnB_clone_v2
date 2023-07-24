@@ -15,5 +15,15 @@ class State(BaseModel, Base):
 
     @property
     def cities(self):
+        """Return a list of cities with state_id equal to the current State.id
+        """
         from models import storage
-        return storage.cities(self.id)
+
+        all_cities = storage.all("city")
+        cities_list = []
+
+        for _, v in all_cities:
+            if v.get('state_id') == State.id:
+                cities_list.append(v)
+
+        return cities_list

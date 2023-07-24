@@ -63,17 +63,3 @@ class FileStorage:
 
         if key in FileStorage.__objects:
             del FileStorage.__objects[key]
-
-    def cities(self, state_id):
-        """return a list of cities with state_id equal to the current State.id
-        """
-        city_list = []
-
-        for k, v in FileStorage.__objects.items():
-            if k.split('.')[-1].split('\'')[0] != 'City':
-                continue
-
-            if v.get('state_id') == state_id:
-                city_list.append(v)
-
-        return city_list
