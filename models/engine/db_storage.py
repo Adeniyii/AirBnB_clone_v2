@@ -32,8 +32,9 @@ class DBStorage:
         """Returns a dictionary of model instances from the database"""
         from models.state import State
         from models.city import City
+        from models.user import User
 
-        entity_map = {'state': State, 'city': City}
+        entity_map = {'state': State, 'city': City, 'user': User}
         result_map = {}
 
         if cls is None or cls == '':
@@ -76,6 +77,7 @@ class DBStorage:
         """Creates all tables in the database"""
         from models.city import City
         from models.state import State
+        from models.user import User
         from sqlalchemy.orm import sessionmaker, scoped_session
 
         self.__metadata_obj.create_all(bind=self.__engine)
