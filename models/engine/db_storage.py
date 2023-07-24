@@ -56,14 +56,14 @@ class DBStorage:
                 for object in objects:
                     dictified = object.to_dict()
                     result_map.update(
-                        {dictified['__class__'] + '.' + object.id: dictified})
+                        {dictified['__class__'] + '.' + object.id: object})
 
         else:
             objects = self.__session.query(entity_map[cls.lower()]).all()
             for object in objects:
                 dictified = object.to_dict()
                 result_map.update(
-                    {dictified['__class__'] + '.' + object.id: dictified})
+                    {dictified['__class__'] + '.' + object.id: object})
 
         return result_map
 
