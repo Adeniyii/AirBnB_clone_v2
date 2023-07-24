@@ -35,13 +35,15 @@ class DBStorage:
         from models.user import User
         from models.place import Place
         from models.review import Review
+        from models.amenity import Amenity
 
         entity_map = {
             'state': State,
             'city': City,
             'user': User,
             'place': Place,
-            'review': Review
+            'review': Review,
+            'amenity': Amenity
         }
         result_map = {}
 
@@ -88,6 +90,7 @@ class DBStorage:
         from models.user import User
         from models.place import Place
         from models.review import Review
+        from models.amenity import Amenity
         from sqlalchemy.orm import sessionmaker, scoped_session
 
         self.__metadata_obj.create_all(bind=self.__engine)
