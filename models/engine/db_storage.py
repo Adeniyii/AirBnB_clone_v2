@@ -33,8 +33,14 @@ class DBStorage:
         from models.state import State
         from models.city import City
         from models.user import User
+        from models.place import Place
 
-        entity_map = {'state': State, 'city': City, 'user': User}
+        entity_map = {
+            'state': State,
+            'city': City,
+            'user': User,
+            'place': Place
+        }
         result_map = {}
 
         if cls is None or cls == '':
@@ -78,6 +84,7 @@ class DBStorage:
         from models.city import City
         from models.state import State
         from models.user import User
+        from models.place import Place
         from sqlalchemy.orm import sessionmaker, scoped_session
 
         self.__metadata_obj.create_all(bind=self.__engine)
