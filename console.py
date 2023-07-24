@@ -171,7 +171,7 @@ class HBNBCommand(cmd.Cmd):
 
         key = c_name + "." + c_id
         try:
-            print(storage._FileStorage__objects[key].to_dict())
+            print(storage._FileStorage__objects[key])
         except KeyError:
             print("** no instance found **")
 
@@ -220,9 +220,42 @@ class HBNBCommand(cmd.Cmd):
             if args not in HBNBCommand.classes:
                 print("** class doesn't exist **")
                 return
-            print(storage.all(args))
+            i = 1
+            storage_items = storage.all(args).items()
+            print("[", end="")
+            for _, v in storage_items:
+                if '_sa_instance_state' in v.__dict__:
+                    del v.__dict__['_sa_instance_state']
+
+                print("[{}] ({}) ".format(v.to_dict()['__class__'], v.id),
+                      end="")
+                if (len(storage_items) == i):
+                    print("{}".format(v.__dict__), end="")
+                else:
+                    print("{}, ".format(v.__dict__), end="")
+
+                i += 1
+
+            print("]")
+
         else:
-            print(storage.all(args))
+            i = 1
+            storage_items = storage.all().items()
+            print("[", end="")
+            for _, v in storage_items:
+                if '_sa_instance_state' in v.__dict__:
+                    del v.__dict__['_sa_instance_state']
+
+                print("[{}] ({}) ".format(v.to_dict()['__class__'], v.id),
+                      end="")
+                if (len(storage_items) == i):
+                    print("{}".format(v.__dict__), end="")
+                else:
+                    print("{}, ".format(v.__dict__), end="")
+
+                i += 1
+
+            print("]")
 
     def help_all(self):
         """ Help information for the all command """
