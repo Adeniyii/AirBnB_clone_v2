@@ -1,1 +1,1 @@
-{"State.903d627b-6ab1-4c8c-9e9d-a9142bcc220c": {"name": "Arizona", "id": "903d627b-6ab1-4c8c-9e9d-a9142bcc220c", "created_at": "2023-07-24T18:25:24.277168", "updated_at": "2023-07-24T18:25:24.277201", "__class__": "State"}}
+{"User.db7417f8-7e29-49b6-9733-eaa35cee7325": {"email": "a@a.com", "password": "pwd", "first_name": "fn", "last_name": "ln", "id": "db7417f8-7e29-49b6-9733-eaa35cee7325", "created_at": "2023-07-24T22:07:38.490345", "updated_at": "2023-07-24T22:07:38.490363", "__class__": "User"}}

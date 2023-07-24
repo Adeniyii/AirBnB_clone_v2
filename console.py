@@ -51,7 +51,7 @@ class HBNBCommand(cmd.Cmd):
                 self.onecmd(cmd)
             return type(self).FLAG_END_MANY
         else:
-            kwargs_pattern = re.compile(r'(\w*)=(\"?[a-z0-9A-Z_.\"-]*)\"?',
+            kwargs_pattern = re.compile(r'(\w*)=(\"?[a-z0-9A-Z_.@\"-]*)\"?',
                                         re.MULTILINE)
             line_segments = line.split(" ", 2)
 
