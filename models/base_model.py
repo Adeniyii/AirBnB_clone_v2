@@ -28,8 +28,6 @@ class BaseModel:
             self.updated_at = datetime.now()
 
         elif '__class__' not in kwargs:
-            from models import storage
-
             kwargs['created_at'] = datetime.now()
             kwargs['updated_at'] = datetime.now()
             self.__dict__.update(kwargs)

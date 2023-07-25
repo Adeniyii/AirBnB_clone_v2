@@ -3,6 +3,7 @@
 import cmd
 import sys
 import re
+import json
 import uuid
 from models.base_model import BaseModel
 from models import storage
@@ -44,47 +45,43 @@ class HBNBCommand(cmd.Cmd):
         Usage: <class name>.<command>([<id> [<*args> or <**kwargs>]])
         (Brackets denote optional fields in usage example.)
         """
-        _cmd = _cls = _id = _args = ''  # initialize line elements
+        # if line.find("+") >= 0:
+        #     commands = line.split(" + ")
+        #     for cmd in commands:
+        #         self.onecmd(cmd)
+        #     return type(self).FLAG_END_MANY
+        kwargs_pattern = re.compile(r'(\w*)=(\"?[a-z0-9A-Z_.@\\"-]*)\"?',
+                                    re.MULTILINE)
+        line_segments = line.split(" ", 2)
 
-        # scan for general formating - i.e '.', '(', ')'
+        matched_kwargs = kwargs_pattern.findall(line)
+
+        if matched_kwargs and line_segments[0] == "create":
+            args_dict = {}
+
+            for v in matched_kwargs:
+                if v[1].find("\"") >= 0:
+                    args_dict[v[0]] = v[1].strip("\"").replace("_", " ")
+                elif re.search(r'-?\d*\.\d*', v[1]):
+                    args_dict[v[0]] = float(v[1])
+                elif re.search(r'-?\d*', v[1]):
+                    args_dict[v[0]] = int(v[1])
+                else:
+                    args_dict[v[0]] = v[1].strip("\"").replace("_", " ")
+
+                args_dict[v[0]] = args_dict[v[0]].replace("\\", "")
+
+            str_dict = json.dumps(args_dict)
+            return "{} {} {}".format(
+                line_segments[0], line_segments[1], str_dict)
+
+        # checks if a dot command `<class>.<command>()` was not used
         if not ('.' in line and '(' in line and ')' in line):
             return line
 
-        try:  # parse line left to right
-            pline = line[:]  # parsed line
-
-            # isolate <class name>
-            _cls = pline[:pline.find('.')]
-
-            # isolate and validate <command>
-            _cmd = pline[pline.find('.') + 1:pline.find('(')]
-            if _cmd not in HBNBCommand.dot_cmds:
-                raise Exception
-
-            # if parantheses contain arguments, parse them
-            pline = pline[pline.find('(') + 1:pline.find(')')]
-            if pline:
-                # partition args: (<id>, [<delim>], [<*args>])
-                pline = pline.partition(', ')  # pline convert to tuple
-
-                # isolate _id, stripping quotes
-                _id = pline[0].replace('\"', '')
-                # possible bug here:
-                # empty quotes register as empty _id when replaced
-
-                # if arguments exist beyond _id
-                pline = pline[2].strip()  # pline is now str
-                if pline:
-                    # check for *args or **kwargs
-                    if pline[0] == '{' and pline[-1] == '}'\
-                            and type(eval(pline)) is dict:
-                        _args = pline
-                    else:
-                        _args = pline.replace(',', '')
-                        # _args = _args.replace('\"', '')
-            line = ' '.join([_cmd, _cls, _id, _args])
-
-        except Exception as mess:
+        try:
+            line = self.handle_dot_usage(line)
+        except Exception:
             pass
         finally:
             return line
@@ -128,24 +125,12 @@ class HBNBCommand(cmd.Cmd):
         arg_list = args.split(" ", 1)
 
         if len(arg_list) > 1:
-            parsed_obj['id'] = str(uuid.uuid4())
-            kwargs_pattern = re.compile(r'(\w*)=(\"?[a-z0-9A-Z_.@\\"-]*)\"?', re.MULTILINE)  # noqa
-            matched_kwargs = kwargs_pattern.findall(arg_list[1])
-
-            if matched_kwargs:
-                for v in matched_kwargs:
-                    if v[1].find("\"") >= 0:
-                        parsed_obj[v[0]] = v[1].strip("\"").replace("_", " ")
-                    elif re.search(r'-?\d*\.\d*', v[1]):
-                        parsed_obj[v[0]] = float(v[1])
-                    elif re.search(r'-?\d*', v[1]):
-                        parsed_obj[v[0]] = int(v[1])
-                    else:
-                        parsed_obj[v[0]] = v[1].strip("\"").replace("_", " ")
-
-                    parsed_obj[v[0]] = parsed_obj[v[0]].replace("\\", "")
-            else:
-                pass
+            try:
+                parsed_obj = json.loads(arg_list[1])
+                parsed_obj['id'] = str(uuid.uuid4())
+            except (json.decoder.JSONDecodeError) as err:
+                print("json errrrrrrr")
+                return
         else:
             if not arg_list[0]:
                 print("** class name missing **")
