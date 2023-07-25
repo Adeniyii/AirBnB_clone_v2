@@ -50,7 +50,7 @@ class HBNBCommand(cmd.Cmd):
         #     for cmd in commands:
         #         self.onecmd(cmd)
         #     return type(self).FLAG_END_MANY
-        kwargs_pattern = re.compile(r'(\w*)=(\"?[a-z0-9A-Z_.@\"-]*)\"?',
+        kwargs_pattern = re.compile(r'(\w*)=(\"?[a-z0-9A-Z_.@\\"-]*)\"?',
                                     re.MULTILINE)
         line_segments = line.split(" ", 2)
 
@@ -68,6 +68,8 @@ class HBNBCommand(cmd.Cmd):
                     args_dict[v[0]] = int(v[1])
                 else:
                     args_dict[v[0]] = v[1].strip("\"").replace("_", " ")
+
+                args_dict[v[0]] = args_dict[v[0]].replace("\\", "")
 
             str_dict = json.dumps(args_dict)
             return "{} {} {}".format(
