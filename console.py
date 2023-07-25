@@ -135,15 +135,13 @@ class HBNBCommand(cmd.Cmd):
             if matched_kwargs:
                 for v in matched_kwargs:
                     if v[1].find("\"") >= 0:
-                        parsed_obj[v[0]] = v[1].strip("\"").replace("_", " ")
+                        parsed_obj[v[0]] = v[1].strip("\"").replace("_", " ").replace("\\", "")  # noqa
                     elif re.search(r'-?\d*\.\d*', v[1]):
                         parsed_obj[v[0]] = float(v[1])
                     elif re.search(r'-?\d*', v[1]):
                         parsed_obj[v[0]] = int(v[1])
                     else:
-                        parsed_obj[v[0]] = v[1].strip("\"").replace("_", " ")
-
-                    parsed_obj[v[0]] = parsed_obj[v[0]].replace("\\", "")
+                        parsed_obj[v[0]] = v[1].strip("\"").replace("_", " ").replace("\\", "")  # noqa
             else:
                 pass
         else:
