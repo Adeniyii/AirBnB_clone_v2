@@ -5,10 +5,10 @@ from sqlalchemy import Column, String, ForeignKey
 
 
 class Review(BaseModel, Base):
-    """ Review classto store review information """
+    """ Review class to store review information """
     __tablename__ = "reviews"
 
-    text = Column("description", String(1024), nullable=False)
+    text = Column("text", String(1024), nullable=False)
     place_id = Column(
         "place_id", String(60), ForeignKey("places.id"), nullable=False)
     user_id = Column(
