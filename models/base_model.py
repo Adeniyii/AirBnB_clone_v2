@@ -3,15 +3,9 @@
 import uuid
 from datetime import datetime
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, String, DateTime, Table, ForeignKey
+from sqlalchemy import Column, String, DateTime
 
 Base = declarative_base()
-place_amenity = Table(
-        'post_amenity',
-        Base.metadata,
-        Column('place_id', String(60), ForeignKey('places.id'), primary_key=True, nullable=False),  # noqa
-        Column('amenity_id', String(60), ForeignKey('amenities.id'), primary_key=True, nullable=False)  # noqa
-    )
 
 
 class BaseModel:

@@ -1,8 +1,15 @@
 #!/usr/bin/python3
 """ Place Module for HBNB project """
-from models.base_model import BaseModel, Base, place_amenity
+from models.base_model import BaseModel, Base
 from sqlalchemy import Column, String, ForeignKey, Integer, Float, Table
 from sqlalchemy.orm import relationship
+
+place_amenity = Table(
+        'place_amenity',
+        Base.metadata,
+        Column('place_id', String(60), ForeignKey('places.id'), primary_key=True, nullable=False),  # noqa
+        Column('amenity_id', String(60), ForeignKey('amenities.id'), primary_key=True, nullable=False)  # noqa
+    )
 
 
 class Place(BaseModel, Base):
@@ -25,10 +32,9 @@ class Place(BaseModel, Base):
     reviews = relationship(
         "Review", backref="place", cascade="all, delete, delete-orphan")
     amenity_ids = []
-    place_amenity = place_amenity
     # many to many Place<->Amenity
     amenities = relationship(
-        'Amenity', secondary=place_amenity, back_populates='places', viewonly=False)  # noqa
+        'Amenity', secondary=place_amenity, backref="places", viewonly=False)  # noqa
 
     @property
     def reviews(self):
@@ -44,3 +50,18 @@ class Place(BaseModel, Base):
                 review_list.append(v)
 
         return review_list
+
+    @property
+    def amenities(self):
+        """Return a list of reviews with place_id equal to the current Place.id
+        """
+        from models import storage
+
+        all_amenities = storage.all("amenity")
+        amenity_list = []
+
+        for _, v in all_amenities:
+            if v.get('place_id') == Place.id:
+                amenity_list.append(v)
+
+        return amenity_list
