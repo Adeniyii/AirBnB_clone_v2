@@ -128,7 +128,6 @@ class HBNBCommand(cmd.Cmd):
         arg_list = args.split(" ", 1)
 
         if len(arg_list) > 1:
-            parsed_obj['id'] = str(uuid.uuid4())
             kwargs_pattern = re.compile(r'(\w*)=(\"?[a-z0-9A-Z_.@\\"-]*)\"?', re.MULTILINE)  # noqa
             matched_kwargs = kwargs_pattern.findall(arg_list[1])
 

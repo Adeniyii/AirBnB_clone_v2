@@ -51,17 +51,17 @@ class Place(BaseModel, Base):
 
         return review_list
 
-    @property
-    def amenities(self):
-        """Return a list of reviews with place_id equal to the current Place.id
-        """
-        from models import storage
+    # @property
+    # def amenities(self):
+    #     """Return a list of reviews with place_id equal to the current Place.id  # noqa
+    #     """
+    #     from models import storage
 
-        all_amenities = storage.all("amenity")
-        amenity_list = []
+    #     all_amenities = storage.all("amenity")
+    #     amenity_list = []
 
-        for _, v in all_amenities:
-            if v.get('place_id') == Place.id:
-                amenity_list.append(v)
+    #     for _, v in all_amenities:
+    #         if v.get('place_id') == Place.id:
+    #             amenity_list.append(v)
 
-        return amenity_list
+    #     return amenity_list

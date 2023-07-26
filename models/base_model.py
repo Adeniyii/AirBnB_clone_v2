@@ -22,6 +22,7 @@ class BaseModel:
             self.updated_at = datetime.now()
 
         elif '__class__' not in kwargs:
+            self.id = str(uuid.uuid4())
             kwargs['created_at'] = datetime.now()
             kwargs['updated_at'] = datetime.now()
             self.__dict__.update(kwargs)
