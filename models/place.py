@@ -3,6 +3,7 @@
 from models.base_model import BaseModel, Base
 from sqlalchemy import Column, String, ForeignKey, Integer, Float, Table
 from sqlalchemy.orm import relationship
+import os
 
 place_amenity = Table(
         'place_amenity',
@@ -36,32 +37,34 @@ class Place(BaseModel, Base):
     amenities = relationship(
         'Amenity', secondary=place_amenity, backref="places", viewonly=False)  # noqa
 
-    @property
-    def reviews(self):
-        """Return a list of reviews with place_id equal to the current Place.id
-        """
-        from models import storage
+    if os.getenv('HBNB_TYPE_STORAGE') != "db":
+        @property
+        def reviews(self):
+            """Return a list of reviews with place_id equal to the current Place.id"""  # noqa
+            from models import storage
+            from models.review import Review
 
-        all_reviews = storage.all("review")
-        review_list = []
+            all_reviews = storage.all(Review)
+            review_list = []
 
-        for _, v in all_reviews:
-            if v.get('place_id') == Place.id:
-                review_list.append(v)
+            for _, v in all_reviews:
+                if v.get('place_id') == Place.id:
+                    review_list.append(v)
 
-        return review_list
+            return review_list
 
-    # @property
-    # def amenities(self):
-    #     """Return a list of reviews with place_id equal to the current Place.id  # noqa
-    #     """
-    #     from models import storage
+        @property
+        def amenities(self):
+            """Return a list of reviews with place_id equal to the current Place.id  # noqa
+            """
+            from models import storage
+            from models.amenity import Amenity
 
-    #     all_amenities = storage.all("amenity")
-    #     amenity_list = []
+            all_amenities = storage.all(Amenity)
+            amenity_list = []
 
-    #     for _, v in all_amenities:
-    #         if v.get('place_id') == Place.id:
-    #             amenity_list.append(v)
+            for _, v in all_amenities:
+                if v.get('place_id') == Place.id:
+                    amenity_list.append(v)
 
-    #     return amenity_list
+            return amenity_list

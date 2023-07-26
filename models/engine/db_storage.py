@@ -37,33 +37,25 @@ class DBStorage:
         from models.review import Review
         from models.amenity import Amenity
 
-        entity_map = {
-            'state': State,
-            'city': City,
-            'user': User,
-            'place': Place,
-            'review': Review,
-            'amenity': Amenity
-        }
+        classes = [User, Place, State, City, Amenity, Review]
         result_map = {}
+        objects = []
 
-        if cls is None or cls == '':
-            for _, v in entity_map.items():
-                objects = self.__session.query(v).all()
-                if len(objects) < 1:
-                    continue
-
-                for object in objects:
-                    dictified = object.to_dict()
-                    result_map.update(
-                        {dictified['__class__'] + '.' + object.id: object})
-
-        else:
-            objects = self.__session.query(entity_map[cls.lower()]).all()
+        if cls:
+            objects = self.__session.query(cls).all()
             for object in objects:
                 dictified = object.to_dict()
                 result_map.update(
                     {dictified['__class__'] + '.' + object.id: object})
+        else:
+            for cls in classes:
+                objects.append(self.__session.query(cls).all())
+
+            for object_list in objects:
+                for object in object_list:
+                    dictified = object.to_dict()
+                    result_map.update(
+                        {dictified['__class__'] + '.' + object.id: object})
 
         return result_map
 

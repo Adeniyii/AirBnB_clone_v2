@@ -3,6 +3,7 @@
 from models.base_model import BaseModel, Base
 from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
+import os
 
 
 class State(BaseModel, Base):
@@ -13,17 +14,18 @@ class State(BaseModel, Base):
     cities = relationship(
         'City', backref="state", cascade="all, delete, delete-orphan")
 
-    @property
-    def cities(self):
-        """Return a list of cities with state_id equal to the current State.id
-        """
-        from models import storage
+    if os.getenv('HBNB_TYPE_STORAGE') != "db":
+        @property
+        def cities(self):
+            """Return a list of cities with state_id equal to the current State.id"""  # noqa
+            from models import storage
+            from models.city import City
 
-        all_cities = storage.all("city")
-        cities_list = []
+            all_cities = storage.all(City)
+            cities_list = []
 
-        for _, v in all_cities:
-            if v.get('state_id') == State.id:
-                cities_list.append(v)
+            for _, v in all_cities:
+                if v.get('state_id') == State.id:
+                    cities_list.append(v)
 
-        return cities_list
+            return cities_list

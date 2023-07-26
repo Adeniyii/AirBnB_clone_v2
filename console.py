@@ -185,7 +185,8 @@ class HBNBCommand(cmd.Cmd):
         key = c_name + "." + c_id
         try:
             print("[{}] ({}) {}".format(
-                c_name, c_id, storage.all(c_name)[key].__dict__))
+                c_name, c_id, storage.all(
+                    HBNBCommand.classes[c_name])[key].__dict__))
         except KeyError:
             print("** no instance found **")
 
@@ -217,7 +218,7 @@ class HBNBCommand(cmd.Cmd):
         key = c_name + "." + c_id
 
         try:
-            del storage.all(c_name)[key]
+            del storage.all(HBNBCommand.classes[c_name])[key]
             storage.save()
         except KeyError:
             print("** no instance found **")
@@ -230,46 +231,19 @@ class HBNBCommand(cmd.Cmd):
     def do_all(self, args):
         """ Shows all objects, or all objects of a class"""
         if args:
-            args = args.split(' ')[0]  # remove possible trailing args
-            if args not in HBNBCommand.classes:
+            c_name = args.split(' ')[0]  # remove possible trailing args
+            if c_name not in HBNBCommand.classes:
                 print("** class doesn't exist **")
                 return
-            i = 1
-            storage_items = storage.all(args).items()
-            print("[", end="")
-            for _, v in storage_items:
-                if '_sa_instance_state' in v.__dict__:
-                    del v.__dict__['_sa_instance_state']
 
-                print("[{}] ({}) ".format(v.to_dict()['__class__'], v.id),
-                      end="")
-                if (len(storage_items) == i):
-                    print("{}".format(v.__dict__), end="")
-                else:
-                    print("{}, ".format(v.__dict__), end="")
-
-                i += 1
-
-            print("]")
+            all_objs = storage.all(HBNBCommand.classes[c_name])
+            string_objs = ", ".join([str(v) for _, v in all_objs.items()])
+            print("[", string_objs, "]", sep="")
 
         else:
-            i = 1
-            storage_items = storage.all().items()
-            print("[", end="")
-            for _, v in storage_items:
-                if '_sa_instance_state' in v.__dict__:
-                    del v.__dict__['_sa_instance_state']
-
-                print("[{}] ({}) ".format(v.to_dict()['__class__'], v.id),
-                      end="")
-                if (len(storage_items) == i):
-                    print("{}".format(v.__dict__), end="")
-                else:
-                    print("{}, ".format(v.__dict__), end="")
-
-                i += 1
-
-            print("]")
+            all_objs = storage.all()
+            string_objs = ", ".join([str(v) for _, v in all_objs.items()])
+            print("[", string_objs, "]", sep="")
 
     def help_all(self):
         """ Help information for the all command """
