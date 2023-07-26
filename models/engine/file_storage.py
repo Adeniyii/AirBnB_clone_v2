@@ -58,7 +58,7 @@ class FileStorage:
             return
 
         dict_obj = obj.to_dict()
-        key = "{}.{}".format(dict_obj.__class__, dict_obj.get("id"))
+        key = "{}.{}".format(dict_obj['__class__'], dict_obj.get("id"))
 
         if key in FileStorage.__objects.keys():
             del FileStorage.__objects[key]
