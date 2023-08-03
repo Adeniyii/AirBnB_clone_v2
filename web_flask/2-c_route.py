@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 """Starts a flask application, and defines a single route.
+
 Listening on host 0.0.0.0, port 5000.
 Routes:
     /: Displays 'Hello HBNB!'
@@ -29,4 +30,5 @@ def hbnb_text(text: str):
     return "C {}".format(text.replace("_", " "))
 
 
-app.run("0.0.0.0", 5000)
+if __name__ == "__main__":
+    app.run(host="0.0.0.0")
