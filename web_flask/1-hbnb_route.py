@@ -1,5 +1,6 @@
 #!/usr/bin/python3
-"""Starts a flask application, and defines 2 routes"""
+"""Starts a flask application, and defines 2 routes
+"""
 from flask import Flask
 
 app = Flask(__name__)

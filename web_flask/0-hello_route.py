@@ -1,5 +1,6 @@
 #!/usr/bin/python3
-"""Starts a flask application, and defines a single route"""
+"""Starts a flask application, and defines a single route
+"""
 from flask import Flask
 
 app = Flask(__name__)
