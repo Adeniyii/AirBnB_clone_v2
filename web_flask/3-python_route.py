@@ -33,7 +33,7 @@ def c_hbnb(text: str):
 
 @app.route("/python", strict_slashes=False)
 @app.route("/python/<text>", strict_slashes=False)
-def python_hbnb(text="cool"):
+def python_hbnb(text="is cool"):
     """handle requests for route: python with query param: text"""
     return "Python {}".format(text.replace("_", " "))
 
