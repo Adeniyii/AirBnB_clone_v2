@@ -1,5 +1,8 @@
 #!/usr/bin/python3
-"""Starts a flask application, and defines a single route
+"""Starts a flask application, and defines a single route.
+Listening on host 0.0.0.0, port 5000.
+Routes:
+    /: Displays 'Hello HBNB!'
 """
 from flask import Flask
 

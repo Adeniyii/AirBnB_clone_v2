@@ -4,6 +4,7 @@ Listening on host 0.0.0.0, port 5000.
 Routes:
     /: Displays 'Hello HBNB!'
     /hbnb: Displays 'HBNB'.
+    /c/<text>: Displays 'C <text>'
 """
 from flask import Flask
 
@@ -20,6 +21,12 @@ def hello_hbnb():
 def main_hbnb():
     """handle requests for the hbnb route"""
     return "HBNB"
+
+
+@app.route("/c/<text>", strict_slashes=False)
+def hbnb_text(text: str):
+    """handle requests for route: c with query param: text"""
+    return "C {}".format(text.replace("_", " "))
 
 
 app.run("0.0.0.0", 5000)
