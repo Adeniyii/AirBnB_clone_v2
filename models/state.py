@@ -25,7 +25,7 @@ class State(BaseModel, Base):
             cities_list = []
 
             for _, v in all_cities.items():
-                if v.state_id == State.id:
+                if v.state_id == self.id:
                     cities_list.append(v)
 
             return cities_list
