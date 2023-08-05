@@ -10,7 +10,6 @@ class DBStorage:
     def __init__(self) -> None:
         from sqlalchemy import create_engine
         from models.base_model import Base
-        from sqlalchemy.schema import MetaData
         import os
 
         user = os.getenv('HBNB_MYSQL_USER')
@@ -23,7 +22,7 @@ class DBStorage:
             pool_pre_ping=True)
 
         self.__engine = engine
-        self.__metadata_obj: MetaData = Base.metadata
+        self.__metadata_obj = Base.metadata
 
         if (os.getenv('HBNB_TYPE_STORAGE') == 'test'):
             self.__metadata_obj.drop_all(bind=self.__engine, checkfirst=True)
@@ -88,7 +87,7 @@ class DBStorage:
         self.__metadata_obj.create_all(bind=self.__engine)
 
         session_factory = sessionmaker(self.__engine, expire_on_commit=False)
-        self.__session = scoped_session(session_factory)()
+        self.__session = scoped_session(session_factory)
 
     def close(self):
         """close the current session"""
