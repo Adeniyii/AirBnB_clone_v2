@@ -47,24 +47,14 @@ def cities_by_states():
 def states(id=None):
     """A route for viewing the current states and cities in the database"""
     from models.state import State
-    states = storage.all(State)
-    if id is not None:
-        state_obj = {}
-        for _, state in states.items():
+    if id:
+        for state in storage.all(State).values():
             if state.id == id:
-                state_obj["id"] = state.id
-                state_obj["name"] = state.name
-                state_obj["cities"] = state.cities
-                return render_template("9-states.html", state=state_obj)
-        return render_template("9-states.html", state=None)
-
-    state_map = []
-    for _, state in states.items():
-        value = {}
-        value["id"] = state.id
-        value["name"] = state.name
-        state_map.append(value)
-    return render_template("9-states.html", states=state_map)
+                return render_template("9-states.html", state=state)
+        return render_template("9-states.html")
+    else:
+        states = storage.all(State)
+        return render_template("9-states.html", state=states)
 
 
 @app.teardown_appcontext
