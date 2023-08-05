@@ -3,27 +3,12 @@
 
 Listening on host 0.0.0.0, port 5000.
 Routes:
-    /states_list: displays a HTML page with all states listed
     /cities_by_states: displays a HTML page with all states and cities listed
 """
 from flask import Flask, render_template
 from models import storage
 
 app = Flask(__name__)
-
-
-@app.route("/states_list", strict_slashes=False)
-def states_list():
-    """A route for viewing the current states in the database"""
-    from models.state import State
-    states = storage.all(State)
-    state_map = []
-    for k, state in states.items():
-        value = {}
-        value["id"] = state.id
-        value["name"] = state.name
-        state_map.append(value)
-    return render_template("7-states_list.html", states=state_map)
 
 
 @app.route("/cities_by_states", strict_slashes=False)

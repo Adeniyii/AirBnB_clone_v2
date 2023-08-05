@@ -11,19 +11,15 @@ from models import storage
 app = Flask(__name__)
 
 
-@app.route("/states", strict_slashes=False)
-@app.route("/states/<id>", strict_slashes=False)
-def states(id=None):
-    """A route for viewing the current states and cities in the database"""
+@app.route("/hbnb_filters", strict_slashes=False)
+def hbnb_filters():
+    """Displays the main HBNB filters HTML page."""
     from models.state import State
-    if id:
-        for state in storage.all(State).values():
-            if state.id == id:
-                return render_template("9-states.html", state=state)
-        return render_template("9-states.html")
-    else:
-        states = storage.all(State)
-        return render_template("9-states.html", state=states)
+    from models.amenity import Amenity
+    states = storage.all(State)
+    amenities = storage.all(Amenity)
+    return render_template("10-hbnb_filters.html",
+                           states=states, amenities=amenities)
 
 
 @app.teardown_appcontext
