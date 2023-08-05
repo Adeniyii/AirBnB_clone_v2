@@ -21,6 +21,13 @@
         {% endif %}
       </LI>
     </UL>
+    {% elif states %}
+    <H1>States</H1>
+    <UL>
+      {% for state in states|sort(attribute="name") %}
+      <LI>{{ state.id }}: {{ state.name }}</LI>
+      {% endfor %}
+    </UL>
     {% else %}
     <H1>Not found!</H1>
     {% endif %}

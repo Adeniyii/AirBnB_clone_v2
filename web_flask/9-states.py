@@ -41,21 +41,30 @@ def cities_by_states():
         state_map.append(value)
     return render_template("8-cities_by_states.html", states=state_map)
 
-
+@app.route("/states", strict_slashes=False)
 @app.route("/states/<id>", strict_slashes=False)
-def states(id):
+def states(id=None):
     """A route for viewing the current states and cities in the database"""
     from models.state import State
     states = storage.all(State)
-    state_obj = {}
-    for _, state in states.items():
-        if state.id == id:
-            state_obj["id"] = state.id
-            state_obj["name"] = state.name
-            state_obj["cities"] = state.cities
-            return render_template("9-states.html", state=state_obj)
+    if id is not None:
+        state_obj = {}
+        for _, state in states.items():
+            if state.id == id:
+                state_obj["id"] = state.id
+                state_obj["name"] = state.name
+                state_obj["cities"] = state.cities
+                return render_template("9-states.html", state=state_obj)
+        return render_template("9-states.html", state=None)
 
-    return render_template("9-states.html", state=None)
+    
+    state_map = []
+    for _, state in states.items():
+        value = {}
+        value["id"] = state.id
+        value["name"] = state.name
+        state_map.append(value)
+    return render_template("9-states.html", states=state_map)
 
 
 
