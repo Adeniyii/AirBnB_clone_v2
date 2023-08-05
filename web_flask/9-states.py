@@ -41,6 +41,7 @@ def cities_by_states():
         state_map.append(value)
     return render_template("8-cities_by_states.html", states=state_map)
 
+
 @app.route("/states", strict_slashes=False)
 @app.route("/states/<id>", strict_slashes=False)
 def states(id=None):
@@ -57,7 +58,6 @@ def states(id=None):
                 return render_template("9-states.html", state=state_obj)
         return render_template("9-states.html", state=None)
 
-    
     state_map = []
     for _, state in states.items():
         value = {}
@@ -65,7 +65,6 @@ def states(id=None):
         value["name"] = state.name
         state_map.append(value)
     return render_template("9-states.html", states=state_map)
-
 
 
 @app.teardown_appcontext
