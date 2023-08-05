@@ -31,7 +31,7 @@ def cleanup(f):
     try:
         storage.close()
     except Exception as err:
-        print ("err: ", err)
+        print("err: ", err)
 
     return f
 
